@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Concrete Pour Volume & Mix Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="max-w-3xl mx-auto px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-3xl font-bold text-gray-900">Concrete Pour Volume & Mix Calculator</h1>
+      <p class="text-gray-500 mt-1">Compute volume, material quantities, bag count, and total cost</p>
+    </header>
+
+    <!-- Structure type -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">Structure Type</h2>
+      <div class="flex flex-wrap gap-3" role="radiogroup" aria-label="Structure type">
+        <label class="cursor-pointer">
+          <input type="radio" name="structType" value="slab" checked class="sr-only" />
+          <span class="block border-2 border-gray-200 rounded-xl px-5 py-2.5 text-sm font-medium text-gray-700 hover:border-blue-400 transition selected-type">Slab</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="structType" value="footing" class="sr-only" />
+          <span class="block border-2 border-gray-200 rounded-xl px-5 py-2.5 text-sm font-medium text-gray-700 hover:border-blue-400 transition">Footing</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="structType" value="column" class="sr-only" />
+          <span class="block border-2 border-gray-200 rounded-xl px-5 py-2.5 text-sm font-medium text-gray-700 hover:border-blue-400 transition">Column</span>
+        </label>
+        <label class="cursor-pointer">
+          <input type="radio" name="structType" value="stairs" class="sr-only" />
+          <span class="block border-2 border-gray-200 rounded-xl px-5 py-2.5 text-sm font-medium text-gray-700 hover:border-blue-400 transition">Stairs</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Dimensions -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">Dimensions</h2>
+      <div id="dimFields" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        <!-- Rendered by JS -->
+      </div>
+      <div class="mt-3">
+        <label class="text-sm font-medium text-gray-600 mr-2" for="unitSys">Units:</label>
+        <select id="unitSys" class="border border-gray-200 rounded-xl px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Unit system">
+          <option value="imperial">Imperial (ft / in)</option>
+          <option value="metric">Metric (m / cm)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Mix Design -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+      <h2 class="text-base font-semibold text-gray-800 mb-3">Mix Design & Pricing</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="mixRatio">Mix Ratio</label>
+          <select id="mixRatio" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Mix ratio">
+            <option value="1:2:3">1:2:3 (Standard)</option>
+            <option value="1:1.5:3">1:1.5:3 (Strong)</option>
+            <option value="1:3:6">1:3:6 (Lean)</option>
+            <option value="1:2:4">1:2:4 (General)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="wasteFactor">Waste Factor (%)</label>
+          <input id="wasteFactor" type="number" min="0" max="30" value="10" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Waste factor percent" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="bagWeight">Bag Weight (lbs)</label>
+          <select id="bagWeight" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Cement bag weight">
+            <option value="94">94 lb (standard)</option>
+            <option value="80">80 lb</option>
+            <option value="60">60 lb</option>
+          </select>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="cementPrice">Cement ($/bag)</label>
+          <input id="cementPrice" type="number" min="0" step="0.01" value="12.50" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Cement price per bag" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="sandPrice">Sand ($/ton)</label>
+          <input id="sandPrice" type="number" min="0" step="0.01" value="35.00" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Sand price per ton" />
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1" for="gravelPrice">Gravel ($/ton)</label>
+          <input id="gravelPrice" type="number" min="0" step="0.01" value="45.00" class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400" aria-label="Gravel price per ton" />
+        </div>
+      </div>
+    </div>
+
+    <button id="calcBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition text-base mb-6">Calculate</button>
+
+    <!-- Results -->
+    <div id="results" class="hidden" aria-live="polite">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-5">
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 text-center">
+          <p class="text-xs text-gray-400 uppercase font-medium mb-1">Net Volume</p>
+          <p class="text-xl font-bold text-blue-600" id="netVol"></p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 text-center">
+          <p class="text-xs text-gray-400 uppercase font-medium mb-1">With Waste</p>
+          <p class="text-xl font-bold text-gray-800" id="totalVol"></p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 text-center">
+          <p class="text-xs text-gray-400 uppercase font-medium mb-1">Cement Bags</p>
+          <p class="text-xl font-bold text-gray-800" id="cementBags"></p>
+        </div>
+        <div class="bg-white rounded-2xl border border-gray-200 p-4 text-center">
+          <p class="text-xs text-gray-400 uppercase font-medium mb-1">Est. Total Cost</p>
+          <p class="text-xl font-bold text-green-600" id="totalCost"></p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-5">
+        <h3 class="text-base font-semibold text-gray-800 mb-3">Material Quantities</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="matGrid"></div>
+      </div>
+
+      <!-- Slump reference -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-base font-semibold text-gray-800 mb-3">Slump Class Reference</h3>
+        <table class="w-full text-sm" aria-label="Slump class reference">
+          <thead class="text-gray-500 border-b border-gray-100">
+            <tr>
+              <th class="text-left pb-2 font-medium">Class</th>
+              <th class="text-left pb-2 font-medium">Slump Range</th>
+              <th class="text-left pb-2 font-medium">Typical Use</th>
+              <th class="text-left pb-2 font-medium">w/c Ratio</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-50"><td class="py-1.5 font-semibold">S1</td><td>10–40 mm</td><td>Mass concrete, lightly reinforced</td><td>0.45–0.50</td></tr>
+            <tr class="border-b border-gray-50"><td class="py-1.5 font-semibold">S2</td><td>50–90 mm</td><td>Normal slabs, foundations</td><td>0.50–0.55</td></tr>
+            <tr class="border-b border-gray-50"><td class="py-1.5 font-semibold">S3</td><td>100–150 mm</td><td>Beams, columns, pumped concrete</td><td>0.55–0.60</td></tr>
+            <tr class="border-b border-gray-50"><td class="py-1.5 font-semibold">S4</td><td>160–210 mm</td><td>Heavily reinforced sections</td><td>0.60–0.65</td></tr>
+            <tr><td class="py-1.5 font-semibold">S5</td><td>&gt;220 mm (self-compacting)</td><td>Complex formwork, precast</td><td>&gt;0.65</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+const DIM_FIELDS = {
+  slab:    [{ id: 'length', label: 'Length', unit: 'ft' }, { id: 'width', label: 'Width', unit: 'ft' }, { id: 'thickness', label: 'Thickness', unit: 'in' }],
+  footing: [{ id: 'length', label: 'Length', unit: 'ft' }, { id: 'width', label: 'Width', unit: 'ft' }, { id: 'depth', label: 'Depth', unit: 'in' }],
+  column:  [{ id: 'diameter', label: 'Diameter', unit: 'in' }, { id: 'height', label: 'Height', unit: 'ft' }, { id: 'count', label: 'Count', unit: '' }],
+  stairs:  [{ id: 'rise', label: 'Rise', unit: 'in' }, { id: 'tread', label: 'Tread', unit: 'in' }, { id: 'width', label: 'Width', unit: 'ft' }, { id: 'steps', label: '# Steps', unit: '' }],
+};
+
+const MIX_RATIOS = {
+  '1:2:3': [1, 2, 3],
+  '1:1.5:3': [1, 1.5, 3],
+  '1:3:6': [1, 3, 6],
+  '1:2:4': [1, 2, 4],
+};
+
+let currentType = 'slab';
+
+function renderDimFields() {
+  const fields = DIM_FIELDS[currentType];
+  const isMetric = document.getElementById('unitSys').value === 'metric';
+  const container = document.getElementById('dimFields');
+  container.innerHTML = fields.map(f => {
+    const unitLabel = isMetric ? (f.unit === 'ft' ? 'm' : f.unit === 'in' ? 'cm' : f.unit) : f.unit;
+    const defaults = { length: 12, width: 12, thickness: 4, depth: 12, height: 8, diameter: 12, count: 4, rise: 7, tread: 10, steps: 8, width: 4 };
+    return `
+    <div>
+      <label class="block text-sm font-medium text-gray-600 mb-1" for="dim-${f.id}">${f.label}${unitLabel ? ' (' + unitLabel + ')' : ''}</label>
+      <input id="dim-${f.id}" type="number" min="0" step="0.01" value="${defaults[f.id] || 1}"
+        class="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+        aria-label="${f.label} in ${unitLabel}" />
+    </div>`;
+  }).join('');
+}
+
+function getDimValue(id) {
+  const el = document.getElementById(`dim-${id}`);
+  return el ? parseFloat(el.value) || 0 : 0;
+}
+
+function calcVolumeInCubicYards() {
+  const isMetric = document.getElementById('unitSys').value === 'metric';
+  let volCubicFt = 0;
+
+  if (currentType === 'slab' || currentType === 'footing') {
+    const l = getDimValue('length');
+    const w = getDimValue('width');
+    const d = currentType === 'slab' ? getDimValue('thickness') : getDimValue('depth');
+    if (isMetric) {
+      // m + cm → convert to ft
+      const lFt = l * 3.28084;
+      const wFt = w * 3.28084;
+      const dFt = (d / 100) * 3.28084;
+      volCubicFt = lFt * wFt * dFt;
+    } else {
+      volCubicFt = l * w * (d / 12);
+    }
+  } else if (currentType === 'column') {
+    const diam = getDimValue('diameter');
+    const h = getDimValue('height');
+    const count = getDimValue('count') || 1;
+    if (isMetric) {
+      const r = (diam / 100) / 2;
+      volCubicFt = Math.PI * r * r * h * 3.28084 * count;
+    } else {
+      const r = (diam / 12) / 2;
+      volCubicFt = Math.PI * r * r * h * count;
+    }
+  } else if (currentType === 'stairs') {
+    const rise = getDimValue('rise');
+    const tread = getDimValue('tread');
+    const width = getDimValue('width');
+    const steps = getDimValue('steps') || 1;
+    if (isMetric) {
+      const riseFt = (rise / 100) * 3.28084;
+      const treadFt = (tread / 100) * 3.28084;
+      const wFt = width * 3.28084;
+      volCubicFt = 0.5 * riseFt * treadFt * wFt * steps;
+    } else {
+      const riseFt = rise / 12;
+      const treadFt = tread / 12;
+      volCubicFt = 0.5 * riseFt * treadFt * width * steps;
+    }
+  }
+
+  return volCubicFt / 27; // cubic yards
+}
+
+document.querySelectorAll('input[name="structType"]').forEach(radio => {
+  radio.addEventListener('change', () => {
+    document.querySelectorAll('input[name="structType"] + span').forEach(s => s.classList.remove('border-blue-500', 'bg-blue-50', 'text-blue-700'));
+    if (radio.checked) {
+      radio.nextElementSibling.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+      currentType = radio.value;
+      renderDimFields();
+    }
+  });
+});
+
+document.querySelectorAll('input[name="structType"]')[0].nextElementSibling.classList.add('border-blue-500', 'bg-blue-50', 'text-blue-700');
+document.getElementById('unitSys').addEventListener('change', renderDimFields);
+
+document.getElementById('calcBtn').addEventListener('click', () => {
+  const volYd3 = calcVolumeInCubicYards();
+  const waste = parseFloat(document.getElementById('wasteFactor').value) / 100 || 0;
+  const totalVol = volYd3 * (1 + waste);
+  const ratioKey = document.getElementById('mixRatio').value;
+  const [rC, rS, rG] = MIX_RATIOS[ratioKey];
+  const totalParts = rC + rS + rG;
+
+  // 1 cubic yard of concrete ≈ 27 cu ft ≈ approx 3900 lbs
+  // Dry material expansion factor ~1.54
+  const totalCubicFt = totalVol * 27;
+  const dryFactor = 1.54;
+  const bagLbs = parseFloat(document.getElementById('bagWeight').value) || 94;
+
+  // cement in cu ft → bags
+  const cementCuFt = (rC / totalParts) * totalCubicFt * dryFactor;
+  const cementLbs = cementCuFt * 94; // density ~94 lb/cuft
+  const cementBags = Math.ceil(cementLbs / bagLbs);
+
+  const sandCuFt = (rS / totalParts) * totalCubicFt * dryFactor;
+  const sandTons = (sandCuFt * 100) / 2000; // ~100 lb/cuft
+
+  const gravelCuFt = (rG / totalParts) * totalCubicFt * dryFactor;
+  const gravelTons = (gravelCuFt * 105) / 2000;
+
+  const waterGallons = totalVol * 25; // ~25 gal/yd3
+
+  const cementCost = cementBags * (parseFloat(document.getElementById('cementPrice').value) || 0);
+  const sandCost = sandTons * (parseFloat(document.getElementById('sandPrice').value) || 0);
+  const gravelCost = gravelTons * (parseFloat(document.getElementById('gravelPrice').value) || 0);
+  const totalCost = cementCost + sandCost + gravelCost;
+
+  function fmt(n, unit) { return n.toFixed(2) + ' ' + unit; }
+  function fmtMoney(n) { return '$' + n.toFixed(2); }
+
+  document.getElementById('netVol').textContent = fmt(volYd3, 'yd³');
+  document.getElementById('totalVol').textContent = fmt(totalVol, 'yd³');
+  document.getElementById('cementBags').textContent = cementBags;
+  document.getElementById('totalCost').textContent = fmtMoney(totalCost);
+
+  document.getElementById('matGrid').innerHTML = [
+    { label: 'Cement', value: fmt(cementLbs, 'lbs'), sub: `${cementBags} bags × ${bagLbs} lb`, icon: '🏗️' },
+    { label: 'Sand', value: fmt(sandCuFt, 'ft³'), sub: `${fmt(sandTons, 'tons')}`, icon: '🏖️' },
+    { label: 'Gravel', value: fmt(gravelCuFt, 'ft³'), sub: `${fmt(gravelTons, 'tons')}`, icon: '🪨' },
+    { label: 'Water', value: fmt(waterGallons, 'gal'), sub: 'approx.', icon: '💧' },
+  ].map(m => `
+    <div class="bg-gray-50 rounded-xl p-4 border border-gray-100">
+      <div class="text-xl mb-1">${m.icon}</div>
+      <p class="text-xs text-gray-400 uppercase font-medium">${m.label}</p>
+      <p class="font-bold text-gray-800">${m.value}</p>
+      <p class="text-xs text-gray-500">${m.sub}</p>
+    </div>`).join('');
+
+  document.getElementById('results').classList.remove('hidden');
+  document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+renderDimFields();
+</script>
+</body>
+</html>
